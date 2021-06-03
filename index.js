@@ -1,24 +1,18 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import 'bootstrap/dist/css/bootstrap.css';
+const winston = require("winston");
+const express = require("express");
+const config = require("config");
+const app = express();
 
-import { Provider } from "react-redux";
-import store from "./redux/store";
-import { BrowserRouter } from 'react-router-dom';
+require("./startup/logging")();
+require("./startup/cors")(app);
+require("./startup/routes")(app);
+require("./startup/db")();
+require("./startup/config")();
+require("./startup/validation")();
 
-ReactDOM.render(
-  <Provider store={store}>
-    <React.StrictMode>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </React.StrictMode>
-  </Provider>,
-  document.getElementById('root')
+const port = process.env.PORT || config.get("port");
+const server = app.listen(port, () =>
+  winston.info(`Listening on port ${port}...`)
 );
 
-
-reportWebVitals();
+module.exports = server;
